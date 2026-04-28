@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>同频生命 - 虚拟宠物成长</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 页面容器 -->
+    <div id="page-container">
+      <!-- 匹配页面 (初始显示) -->
+      <section id="page-match" class="page active">
+        <div class="card">
+          <h1 class="title">寻找你的同频伙伴</h1>
+          <p class="intro">每一次努力，都有伙伴一起见证。你可以随心抽选一只伙伴，也可以通过几个小问题，找到和你同频的它。</p>
+          <div class="match-options">
+            <button class="primary-btn match-btn" onclick="app.startQuiz()">🧩 开始答题匹配</button>
+            <div class="or-divider">或者</div>
+            <button class="secondary-btn match-btn" onclick="app.randomPick()">🎲 随机抽选宠物</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 专注页面 -->
+      <section id="page-focus" class="page">
+        <!-- 今日任务 -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="section-title">今日任务</h2>
+            <div class="edit-btn" id="daily-task-edit-btn" onclick="app.toggleDailyTaskEditor()">设定目标</div>
+          </div>
+          <div id="daily-task-empty" class="empty-tip">设定一个目标，让宠物陪你一起完成</div>
+          <div id="daily-task-info" class="daily-task-info hidden">
+            <div class="task-goal" id="display-task-goal">🎯 目标名称</div>
+            <div class="task-split" id="display-task-split">总目标：0分钟 ➔ 每日建议：0分钟</div>
+            <div class="progress-container">
+              <div class="progress-header">
+                <span>今日进度</span>
+                <span id="display-task-progress">0 / 0 分钟</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="task-progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          <div id="daily-task-editor" class="editor hidden">
+            <div class="label">我的总目标</div>
+            <input class="input" id="input-daily-goal" placeholder="例如：看完《自控力》">
+            <div class="label">总计需要（分钟）</div>
+            <input class="input" id="input-daily-total" type="number" placeholder="预计总投入时长">
+            <div class="label">预计几天完成</div>
+            <input class="input" id="input-daily-days" type="number" placeholder="输入天数，自动拆分">
+            <div id="split-preview" class="split-preview hidden">
+              💡 每日专注时长建议：<span class="highlight" id="suggested-minutes">0</span> 分钟
+            </div>
+            <button class="primary-btn" onclick="app.saveDailyTask()">开始挑战</button>
+          </div>
+        </div>
+
+        <!-- 我的成长计划 (补全) -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="section-title">我的成长计划</h2>
+            <div class="edit-btn" id="plan-edit-btn" onclick="app.togglePlanEditor()">编辑</div>
+          </div>
+          <p class="plan-line">自由创建：看书、练表达、写作、运动...</p>
+          <p class="plan-line" id="growth-summary-line">成长阶段：蛋 ｜ 今日自律完成项：0 / 3</p>
+
+          <div id="plan-editor" class="editor hidden">
+            <div class="label">计划标题</div>
+            <input class="input" id="input-plan-title" placeholder="例如：看书">
+            <div class="label">总目标</div>
+            <input class="input" id="input-plan-total" type="number" placeholder="总数">
+            <div class="label">每日目标</div>
+            <input class="input" id="input-plan-daily" type="number" placeholder="每日建议">
+            <div class="label">单位（如：分钟/页/次）</div>
+            <input class="input" id="input-plan-unit" placeholder="单位">
+            <button class="primary-btn" onclick="app.saveCustomPlan()">保存计划</button>
+          </div>
+
+          <div id="plan-list" class="plan-list">
+            <!-- 动态渲染计划列表 -->
+          </div>
+        </div>
+
+        <!-- 早起打卡 (补全) -->
+        <div class="card">
+          <h2 class="section-title">早起打卡喂食（04:30-08:00）</h2>
+          <p class="plan-line">早起打卡会提升宠物心情，并推进孵化进度。</p>
+          <button class="checkin-btn" id="morning-checkin-btn" onclick="app.morningCheckin()">早起打卡喂食</button>
+        </div>
+
+        <!-- 专注训练 -->
+        <div class="card">
+          <h2 class="section-title">专注训练</h2>
+          <div class="label">专注时长</div>
+          <div class="option-row" id="duration-options">
+            <div class="chip active" data-minutes="10">10分钟</div>
+            <div class="chip" data-minutes="25">25分钟</div>
+            <div class="chip" data-minutes="50">50分钟</div>
+          </div>
+          <button class="primary-btn" id="start-focus-btn" onclick="app.startFocus()">开始专注</button>
+          
+          <div class="label space-top">休息时长</div>
+          <div class="option-row" id="rest-options">
+            <div class="chip active" data-minutes="5">休息5分钟</div>
+            <div class="chip" data-minutes="10">休息10分钟</div>
+          </div>
+          <button class="secondary-btn" id="start-rest-btn" onclick="app.startRest()">开始休息</button>
+
+          <div class="timer-text" id="timer-display">10:00</div>
+          <div id="timer-tip" class="counting-tip hidden">专注倒计时进行中，请保持节奏。</div>
+        </div>
+
+        <!-- 今日复盘 (补全) -->
+        <div class="card">
+          <h2 class="section-title">今日复盘（20:00-23:59）</h2>
+          <p class="plan-line">今日复盘将为你记录成长轨迹，并提供大量经验值。</p>
+          <div id="night-review-inputs">
+            <div class="label">1. 今天的我，有哪些值得肯定的地方？</div>
+            <textarea class="textarea small-textarea" id="review-q1" placeholder="列出今天让你感到自豪的事情"></textarea>
+            <div class="label">2. 今天的我，有哪些可以改进的地方？</div>
+            <textarea class="textarea small-textarea" id="review-q2" placeholder="分析不足，为了明天更好地出发"></textarea>
+            <div class="label">3. 明天的我，最想完成的一件事是什么？</div>
+            <textarea class="textarea small-textarea" id="review-q3" placeholder="明确目标，聚焦能量"></textarea>
+            <div class="label">4. 现在的我，想对明天的自己说什么？</div>
+            <textarea class="textarea small-textarea" id="review-q4" placeholder="写下一句鼓励自己的话"></textarea>
+          </div>
+          <button class="primary-btn space-top" id="night-review-btn" onclick="app.submitNightReview()">提交今日复盘</button>
+        </div>
+      </section>
+
+      <!-- 宠物页面 -->
+      <section id="page-pet" class="page">
+        <div class="card pet-status-card">
+          <div class="pet-display">
+            <div class="pet-emoji-large" id="pet-emoji-main">🥚</div>
+            <div class="pet-mood-badge" id="pet-mood-text">普通</div>
+          </div>
+          <div class="pet-info">
+            <h2 class="pet-name" id="pet-name-display">宠物蛋</h2>
+            <p class="pet-line" id="pet-line-display">我在这里，慢慢和你靠近。</p>
+          </div>
+          <div class="growth-stats">
+            <div class="stat-item">
+              <div class="stat-label">孵化/成长进度</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="growth-progress-fill" style="width: 0%"></div>
+              </div>
+              <div class="stat-value" id="growth-progress-text">0%</div>
+            </div>
+          </div>
+          <button class="primary-btn" onclick="app.openPetCard()">查看成长档案</button>
+        </div>
+
+        <div class="energy-bar-footer">
+          能量：<span id="global-energy">30</span> ｜ 孵化：<span id="global-hatch">0</span>%
+        </div>
+      </section>
+
+      <!-- 我的页面 -->
+      <section id="page-mine" class="page">
+        <div class="card user-card">
+          <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <div class="user-name">同频行者</div>
+              <div class="user-streak">已连续坚持 <span id="streak-days">0</span> 天</div>
+            </div>
+          </div>
+        </div>
+        <div class="card stats-card">
+          <h3 class="section-title">我的成就</h3>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-num" id="total-focus-min">0</div>
+              <div class="stat-label">累计专注(分)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num" id="total-sessions">0</div>
+              <div class="stat-label">专注次数</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num" id="total-reviews">0</div>
+              <div class="stat-label">复盘次数</div>
+            </div>
+          </div>
+        </div>
+        <button class="danger-btn" onclick="app.resetData()">重置所有数据</button>
+      </section>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <nav id="tab-bar" class="hidden">
+      <div class="tab-item active" onclick="app.switchTab('focus')">
+        <span class="tab-icon">🎯</span>
+        <span class="tab-text">专注</span>
+      </div>
+      <div class="tab-item" onclick="app.switchTab('pet')">
+        <span class="tab-icon">🐾</span>
+        <span class="tab-text">宠物</span>
+      </div>
+      <div class="tab-item" onclick="app.switchTab('mine')">
+        <span class="tab-icon">👤</span>
+        <span class="tab-text">我的</span>
+      </div>
+    </nav>
+
+    <!-- 弹窗系统 -->
+    <!-- 答题匹配弹窗 -->
+    <div id="modal-quiz" class="modal hidden">
+      <div class="modal-content">
+        <h2 class="modal-title">答题匹配</h2>
+        <div class="step-indicator" id="quiz-step">第 1 / 7 题</div>
+        <div class="question-container">
+          <div class="question-title" id="quiz-question-title">题目内容</div>
+          
+          <div id="quiz-options-container">
+            <!-- 动态生成选项或选择器 -->
+          </div>
+        </div>
+        <button class="primary-btn" id="quiz-next-btn" onclick="app.nextQuizStep()">下一题</button>
+      </div>
+    </div>
+
+    <!-- 匹配结果弹窗 -->
+    <div id="modal-result" class="modal hidden">
+      <div class="modal-content text-center">
+        <h2 class="modal-title">匹配完成</h2>
+        <div class="result-egg" id="result-emoji">🥚</div>
+        <div class="result-animal-name" id="result-animal-name">宠物名称</div>
+        <div class="result-status">正在孵化中</div>
+        <div class="result-desc" id="result-desc">描述文本</div>
+        <div class="science-card hidden" id="science-card">
+          <h3 class="science-title">为什么是它</h3>
+          <p class="science-text" id="science-text">科普文本</p>
+        </div>
+        <button class="primary-btn" onclick="app.closeResultAndStart()">开始一起成长</button>
+      </div>
+    </div>
+
+    <!-- 轻复盘弹窗 -->
+    <div id="modal-review" class="modal hidden">
+      <div class="modal-content">
+        <div class="pet-feedback-area">
+          <div class="pet-emoji-mid" id="review-pet-emoji">🥚</div>
+          <div class="feedback-bubble" id="review-feedback-text">这一段，没有断</div>
+        </div>
+
+        <div id="review-step-1" class="review-step">
+          <h3 class="review-title">今天的你，更接近哪种状态？</h3>
+          <div class="option-list">
+            <div class="review-option" onclick="app.selectReviewStatus('很稳 👍')">很稳 👍</div>
+            <div class="review-option" onclick="app.selectReviewStatus('有点乱 😵')">有点乱 😵</div>
+            <div class="review-option" onclick="app.selectReviewStatus('但我在坚持 💪')">但我在坚持 💪</div>
+          </div>
+          <button class="primary-btn" id="review-next-btn" disabled onclick="app.nextReviewStep()">下一步</button>
+        </div>
+
+        <div id="review-step-2" class="review-step hidden">
+          <h3 class="review-title">有没有一件小事，让你觉得还不错？</h3>
+          <textarea class="textarea small-textarea" id="review-input" placeholder="（可跳过）"></textarea>
+          <button class="primary-btn" onclick="app.finishReview()">完成</button>
+          <div class="skip-link" onclick="app.finishReview()">跳过并完成</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 宠物档案弹窗 -->
+    <div id="modal-pet-card" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">成长档案</h2>
+          <span class="close-icon" onclick="app.closePetCard()">✕</span>
+        </div>
+        <div class="card-scroll-area">
+          <div class="info-section">
+            <h3 class="info-title">关于我的伙伴</h3>
+            <p id="pet-desc-full">加载中...</p>
+          </div>
+          <div class="info-section">
+            <h3 class="info-title">已解锁的真相</h3>
+            <ul class="unlock-list" id="unlocked-truths"></ul>
+          </div>
+          <div class="info-section">
+            <h3 class="info-title">已解锁的栖息地</h3>
+            <ul class="unlock-list" id="unlocked-habitats"></ul>
+          </div>
+        </div>
+        <button class="secondary-btn" onclick="app.rematchPet()">重新匹配伙伴</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

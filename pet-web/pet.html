@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>宠物养成</title>
+  <link rel="stylesheet" href="pet.css">
+</head>
+<body>
+  <div class="page">
+    <div class="pet-card">
+      <div class="pet-avatar" id="petAvatar">🥚</div>
+      <div class="stage-tag">成长阶段：<span id="growthStageText">蛋</span></div>
+      <div class="pet-mood">心情：<span id="moodText">普通</span></div>
+      <div class="bubble" id="petLine">我在这里，慢慢和你靠近。</div>
+      <div class="bubble hidden" id="stageAppearance">
+        外观：<span id="pattern"></span> ｜ 体型：<span id="body"></span> ｜ 习性：<span id="behavior"></span>
+      </div>
+      <div class="tap-tip">点击头像查看生命卡片</div>
+    </div>
+
+    <div class="info-card">
+      <div class="row">
+        <span>孵化进度</span>
+        <span id="hatchProgressText">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="hatchProgress" style="width: 0%"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <div class="label">生命</div>
+          <div class="value" id="animalName"></div>
+        </div>
+        <div class="stat-item">
+          <div class="label">解锁信息</div>
+          <div class="value" id="unlockedCount">0槽位</div>
+        </div>
+        <div class="stat-item">
+          <div class="label">累计专注</div>
+          <div class="value" id="totalFocusMinutes">0分钟</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="row">
+        <span>重新匹配宠物</span>
+        <span id="rematchCost">首次免费</span>
+      </div>
+      <button class="rematch-btn" id="rematchBtn">重新匹配宠物</button>
+    </div>
+
+    <div class="overlay hidden" id="overlay" onclick="closeCard()">
+      <div class="life-card" onclick="event.stopPropagation()">
+        <div class="life-title" id="lifeTitle"></div>
+        <div class="line">科目：<span id="animalFamily"></span></div>
+        <div class="line">保护级别：<span id="animalLevel"></span></div>
+        <div class="line">未来成体预览：<span id="adultPreview"></span></div>
+        <div class="line hidden" id="spiderBreedsTitle">蜘蛛品种分化（成体）：</div>
+        <div class="detail-container" id="spiderBreeds"></div>
+        <div class="line">被误解：<span id="misunderstood"></span></div>
+        <div class="line">真实优点：</div>
+        <div class="detail-container" id="unlockedTruths"></div>
+
+        <div class="line">生存现状 / 栖息地：</div>
+        <div class="detail-container" id="unlockedHabitats"></div>
+
+        <div class="line">成长寄语：<span id="growthWords"></span></div>
+        <div class="line">温柔保护提示：<span id="protectTip"></span></div>
+        <div class="line done-note hidden" id="cardReadyNote">
+          终于，你看见我了。谢谢你愿意了解我，不只是别人口中的样子。未来，我们一起成长吧。
+        </div>
+        <button class="close-btn" onclick="closeCard()">我知道啦</button>
+      </div>
+    </div>
+  </div>
+  <script src="pet.js"></script>
+</body>
+</html>
